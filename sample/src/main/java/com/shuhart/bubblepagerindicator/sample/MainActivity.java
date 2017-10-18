@@ -1,4 +1,4 @@
-package com.shuhart.bubblepagerindicator;
+package com.shuhart.bubblepagerindicator.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
