@@ -21,7 +21,9 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
  */
 public class BubblePageIndicator extends View implements ViewPager.OnPageChangeListener {
     private static final int INVALID_POINTER = -1;
+    private static final int DEFAULT_ON_SURFACE_COUNT = 5;
 
+    private int onSurfaceCount = DEFAULT_ON_SURFACE_COUNT;
     private float radius;
     private final Paint paintPageFill = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintStroke = new Paint(ANTI_ALIAS_FLAG);
@@ -83,6 +85,10 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         touchSlop = configuration.getScaledPagingTouchSlop();
     }
 
+    public void setOnSurfaceCount(int onSurfaceCount) {
+        this.onSurfaceCount = onSurfaceCount;
+        invalidate();
+    }
 
     public void setCentered(boolean centered) {
         this.centered = centered;
