@@ -31,7 +31,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private final Paint paintStroke = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintFill = new Paint(ANTI_ALIAS_FLAG);
     private ViewPager viewPager;
-    private ViewPager.OnPageChangeListener listener;
     private int currentPage;
     private int snapPage;
     private float pageOffset;
@@ -353,10 +352,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     @Override
     public void onPageScrollStateChanged(int state) {
         scrollState = state;
-
-        if (listener != null) {
-            listener.onPageScrollStateChanged(state);
-        }
     }
 
     @Override
@@ -365,10 +360,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         currentPage = position;
         pageOffset = positionOffset;
         invalidate();
-
-        if (listener != null) {
-            listener.onPageScrolled(position, positionOffset, positionOffsetPixels);
-        }
     }
 
     @Override
@@ -379,14 +370,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             snapPage = position;
             invalidate();
         }
-
-        if (listener != null) {
-            listener.onPageSelected(position);
-        }
-    }
-
-    public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
-        this.listener = listener;
     }
 
     /*
