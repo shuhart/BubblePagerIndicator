@@ -22,8 +22,10 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 public class BubblePageIndicator extends View implements ViewPager.OnPageChangeListener {
     private static final int INVALID_POINTER = -1;
     private static final int DEFAULT_ON_SURFACE_COUNT = 5;
+    private static final int DEFAULT_RISING_COUNT = 2;
 
     private int onSurfaceCount = DEFAULT_ON_SURFACE_COUNT;
+    private int risingCount = DEFAULT_RISING_COUNT;
     private float radius;
     private final Paint paintPageFill = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintStroke = new Paint(ANTI_ALIAS_FLAG);
@@ -87,6 +89,11 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     public void setOnSurfaceCount(int onSurfaceCount) {
         this.onSurfaceCount = onSurfaceCount;
+        invalidate();
+    }
+
+    public void setRisingCount(int risingCount) {
+        this.risingCount = risingCount;
         invalidate();
     }
 
@@ -343,6 +350,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         invalidate();
     }
 
+    @Override
     public void onPageScrollStateChanged(int state) {
         scrollState = state;
 
@@ -351,6 +359,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
     }
 
+    @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         position = pagerProvider.getRealPosition(position);
         currentPage = position;
@@ -362,6 +371,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
     }
 
+    @Override
     public void onPageSelected(int position) {
         position = pagerProvider.getRealPosition(position);
         if (snap || scrollState == ViewPager.SCROLL_STATE_IDLE) {
