@@ -150,7 +150,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
 
         final int count = pagerProvider.getRealCount();
-        if (count == 0) {
+        if (count == 0 || count == 1) {
             return;
         }
 
