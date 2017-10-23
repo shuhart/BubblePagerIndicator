@@ -33,11 +33,9 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private int risingCount = DEFAULT_RISING_COUNT;
     private float radius;
     private final Paint paintPageFill = new Paint(ANTI_ALIAS_FLAG);
-    private final Paint paintStroke = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintFill = new Paint(ANTI_ALIAS_FLAG);
     private ViewPager viewPager;
     private int currentPage;
-    private int snapPage;
     private float pageOffset;
     private int scrollState;
     private boolean centered;
@@ -72,11 +70,8 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         final Resources res = getResources();
         final int defaultPageColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_page_color);
         final int defaultFillColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_fill_color);
-        final int defaultStrokeColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_stroke_color);
-        final float defaultStrokeWidth = res.getDimension(R.dimen.default_bubble_indicator_stroke_width);
         final float defaultRadius = res.getDimension(R.dimen.default_bubble_indicator_radius);
         final boolean defaultCentered = res.getBoolean(R.bool.default_bubble_indicator_centered);
-        final boolean defaultSnap = res.getBoolean(R.bool.default_bubble_indicator_snap);
 
         //Retrieve styles attributes
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubblePageIndicator, defStyle, 0);
@@ -84,9 +79,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         centered = a.getBoolean(R.styleable.BubblePageIndicator_centered, defaultCentered);
         paintPageFill.setStyle(Style.FILL);
         paintPageFill.setColor(a.getColor(R.styleable.BubblePageIndicator_pageColor, defaultPageColor));
-        paintStroke.setStyle(Style.STROKE);
-        paintStroke.setColor(a.getColor(R.styleable.BubblePageIndicator_strokeColor, defaultStrokeColor));
-        paintStroke.setStrokeWidth(a.getDimension(R.styleable.BubblePageIndicator_strokeWidth, defaultStrokeWidth));
         paintFill.setStyle(Style.FILL);
         paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, defaultFillColor));
         radius = a.getDimension(R.styleable.BubblePageIndicator_radius, defaultRadius);
@@ -132,24 +124,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     public int getFillColor() {
         return paintFill.getColor();
-    }
-
-    public void setStrokeColor(int strokeColor) {
-        paintStroke.setColor(strokeColor);
-        invalidate();
-    }
-
-    public int getStrokeColor() {
-        return paintStroke.getColor();
-    }
-
-    public void setStrokeWidth(float strokeWidth) {
-        paintStroke.setStrokeWidth(strokeWidth);
-        invalidate();
-    }
-
-    public float getStrokeWidth() {
-        return paintStroke.getStrokeWidth();
     }
 
     public void setRadius(float radius) {
@@ -201,22 +175,12 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         float dX;
         float dY;
 
-        float pageFillRadius = radius;
-        if (paintStroke.getStrokeWidth() > 0) {
-            pageFillRadius -= paintStroke.getStrokeWidth() / 2.0f;
-        }
-
         for (int iLoop = 0; iLoop < count; iLoop++) {
             dX = longOffset + (iLoop * threeRadius);
             dY = shortOffset;
             // Only paint fill if not completely transparent
             if (paintPageFill.getAlpha() > 0) {
-                canvas.drawCircle(dX, dY, pageFillRadius, paintPageFill);
-            }
-
-            // Only paint stroke if a stroke width was non-zero
-            if (pageFillRadius != radius) {
-                canvas.drawCircle(dX, dY, radius, paintStroke);
+                canvas.drawCircle(dX, dY, radius, paintPageFill);
             }
         }
     }
@@ -381,7 +345,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         position = pagerProvider.getRealPosition(position);
         Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
         currentPage = position;
-        snapPage = position;
         invalidate();
     }
 
