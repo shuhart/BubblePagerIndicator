@@ -339,14 +339,15 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
 
     @Override
     public void onPageSelected(int position) {
         position = pagerProvider.getRealPosition(position);
         Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
         currentPage = position;
-        invalidate();
         if (currentPage > surfaceEnd) {
             surfaceEnd = currentPage;
             surfaceStart = surfaceEnd - onSurfaceCount;
@@ -354,6 +355,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             surfaceStart = currentPage;
             surfaceEnd = surfaceStart + onSurfaceCount;
         }
+        invalidate();
     }
 
     /*
@@ -382,7 +384,9 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             result = specSize;
         } else {
             //Calculate the width according the views count
-            final int count = pagerProvider.getRealCount();
+            int count = pagerProvider.getRealCount();
+            int max = onSurfaceCount + risingCount * 2;
+            count = Math.min(count, max);
             result = (int) (getPaddingLeft() + getPaddingRight()
                     + (count * 2 * radius) + (count - 1) * radius + 1);
             //Respect AT_MOST value if that was what is called for by measureSpec
