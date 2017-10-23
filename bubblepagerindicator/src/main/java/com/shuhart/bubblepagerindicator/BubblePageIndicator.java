@@ -6,14 +6,19 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import java.lang.annotation.Retention;
+
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Draws circles (one for each view). The current view position is filled and
@@ -36,13 +41,20 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private float pageOffset;
     private int scrollState;
     private boolean centered;
-    private boolean snap;
 
     private int touchSlop;
     private float lastMotionX = -1;
     private int activePointerId = INVALID_POINTER;
     private boolean isDragging;
     private ViewPagerProvider pagerProvider;
+
+    private @SlidingMode int slidingMode;
+
+    @Retention(SOURCE)
+    @IntDef({SLIDING_TOWARDS_END, SLIDING_TOWARDS_START})
+    @interface SlidingMode {}
+    public static final int SLIDING_TOWARDS_END = 0;
+    public static final int SLIDING_TOWARDS_START = 1;
 
     public BubblePageIndicator(Context context) {
         this(context, null);
@@ -78,7 +90,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         paintFill.setStyle(Style.FILL);
         paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, defaultFillColor));
         radius = a.getDimension(R.styleable.BubblePageIndicator_radius, defaultRadius);
-        snap = a.getBoolean(R.styleable.BubblePageIndicator_snap, defaultSnap);
 
         a.recycle();
 
@@ -150,15 +161,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         return radius;
     }
 
-    public void setSnap(boolean snap) {
-        this.snap = snap;
-        invalidate();
-    }
-
-    public boolean isSnap() {
-        return snap;
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -222,10 +224,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private void drawFilledCircle(Canvas canvas, float threeRadius, float shortOffset, float longOffset) {
         float dX;
         float dY;
-        float cx = (snap ? snapPage : currentPage) * threeRadius;
-        if (!snap) {
-            cx += pageOffset * threeRadius;
-        }
+        float cx = currentPage * threeRadius;
         dX = longOffset + cx;
         dY = shortOffset;
         canvas.drawCircle(dX, dY, radius, paintFill);
@@ -356,20 +355,34 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        position = pagerProvider.getRealPosition(position);
-        currentPage = position;
-        pageOffset = positionOffset;
-        invalidate();
+//        position = pagerProvider.getRealPosition(position);
+//        Log.d(getClass().getSimpleName(), "onPageScrolled(position=" + position + ", positionOffset=" + positionOffset + ")");
+//        currentPage = position;
+//        pageOffset = positionOffset;
+//        invalidate();
+//        if (currentPage < position) {
+//            // sliding to the end
+//            if (positionOffset >= 0.5) {
+//                currentPage = position;
+//                pageOffset = positionOffset;
+//                invalidate();
+//            }
+//        } else if (currentPage > position) {
+//            if (positionOffset <= 0.5) {
+//                currentPage = position;
+//                pageOffset = positionOffset;
+//                invalidate();
+//            }
+//        }
     }
 
     @Override
     public void onPageSelected(int position) {
         position = pagerProvider.getRealPosition(position);
-        if (snap || scrollState == ViewPager.SCROLL_STATE_IDLE) {
-            currentPage = position;
-            snapPage = position;
-            invalidate();
-        }
+        Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
+        currentPage = position;
+        snapPage = position;
+        invalidate();
     }
 
     /*

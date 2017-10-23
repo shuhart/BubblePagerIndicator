@@ -20,8 +20,6 @@
         <attr name="android:orientation"/>
         <!-- Radius of the circles. This is also the spacing between circles. -->
         <attr name="radius" format="dimension" />
-        <!-- Whether or not the selected indicator snaps to the circles. -->
-        <attr name="snap" format="boolean" />
         <!-- Color of the open circles. -->
         <attr name="strokeColor" format="color" />
         <!-- Width of the stroke used to draw the circles. -->
