@@ -158,11 +158,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             return;
         }
 
-        if (currentPage >= count) {
-            setCurrentItem(count - 1);
-            return;
-        }
-
         int longSize = getWidth();
         int longPaddingBefore = getPaddingLeft();
         int longPaddingAfter = getPaddingRight();
@@ -329,6 +324,9 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         if (viewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
         }
+        if (item < 0 || item > pagerProvider.getRealCount()) {
+            return;
+        }
         viewPager.setCurrentItem(item);
         currentPage = item;
         invalidate();
@@ -345,9 +343,11 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        if (position > currentPage) {
-            if (positionOffset >= 0.5) {
-                currentPage = position;
+        Log.d(getClass().getSimpleName(), "onPageScrolled(): position = "+ position +", currentPage = " + currentPage
+                + ", offset = " + positionOffset);
+        if (position == currentPage) {
+            if (positionOffset >= 0.5 && currentPage + 1 < pagerProvider.getRealCount()) {
+                currentPage += 1;
                 correctSurface();
                 invalidate();
             }
