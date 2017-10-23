@@ -141,6 +141,10 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         return radius;
     }
 
+    private int getRealCount() {
+        return Math.min(onSurfaceCount + risingCount * 2, pagerProvider.getRealCount());
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -149,7 +153,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             return;
         }
 
-        final int count = pagerProvider.getRealCount();
+        final int count = getRealCount();
         if (count == 0 || count == 1) {
             return;
         }
@@ -169,6 +173,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         if (centered) {
             longOffset += ((longSize - longPaddingBefore - longPaddingAfter) / 2.0f) - ((count * threeRadius) / 2.0f);
         }
+        longOffset = Math.max(longOffset, radius);
 
         //Draw stroked circles
         drawStrokedCircles(canvas, count, threeRadius, shortOffset, longOffset);
@@ -219,7 +224,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         if (super.onTouchEvent(ev)) {
             return true;
         }
-        if ((viewPager == null) || (pagerProvider.getRealCount() == 0)) {
+        if ((viewPager == null) || (getRealCount() == 0)) {
             return false;
         }
 
@@ -254,7 +259,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 if (!isDragging) {
-                    final int count = pagerProvider.getRealCount();
+                    final int count = getRealCount();
                     final int width = getWidth();
                     final float halfWidth = width / 2f;
                     final float sixthWidth = width / 6f;
@@ -340,14 +345,22 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+        if (position > currentPage) {
+            if (positionOffset >= 0.5) {
+                currentPage = position;
+                correctSurface();
+                invalidate();
+            }
+        } else if (position < currentPage) {
+            if (positionOffset <= 0.5) {
+                currentPage = position;
+                correctSurface();
+                invalidate();
+            }
+        }
     }
 
-    @Override
-    public void onPageSelected(int position) {
-        position = pagerProvider.getRealPosition(position);
-        Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
-        currentPage = position;
+    private void correctSurface() {
         if (currentPage > surfaceEnd) {
             surfaceEnd = currentPage;
             surfaceStart = surfaceEnd - onSurfaceCount;
@@ -355,7 +368,23 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             surfaceStart = currentPage;
             surfaceEnd = surfaceStart + onSurfaceCount;
         }
-        invalidate();
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (scrollState == ViewPager.SCROLL_STATE_IDLE) {
+            position = pagerProvider.getRealPosition(position);
+            Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
+            currentPage = position;
+            if (currentPage > surfaceEnd) {
+                surfaceEnd = currentPage;
+                surfaceStart = surfaceEnd - onSurfaceCount;
+            } else if (currentPage < surfaceStart) {
+                surfaceStart = currentPage;
+                surfaceEnd = surfaceStart + onSurfaceCount;
+            }
+            invalidate();
+        }
     }
 
     /*
@@ -384,11 +413,12 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             result = specSize;
         } else {
             //Calculate the width according the views count
-            int count = pagerProvider.getRealCount();
+            int count = getRealCount();
             int max = onSurfaceCount + risingCount * 2;
             count = Math.min(count, max);
             result = (int) (getPaddingLeft() + getPaddingRight()
-                    + (count * 2 * radius) + (count - 1) * radius + 1);
+                    + (count * 2 * radius) + (count - 1) * radius + 1
+                    + radius * 4);
             //Respect AT_MOST value if that was what is called for by measureSpec
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
