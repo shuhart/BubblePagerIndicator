@@ -31,6 +31,8 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     private int onSurfaceCount = DEFAULT_ON_SURFACE_COUNT;
     private int risingCount = DEFAULT_RISING_COUNT;
+    private int surfaceStart;
+    private int surfaceEnd = onSurfaceCount - 1;
     private float radius;
     private final Paint paintPageFill = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintFill = new Paint(ANTI_ALIAS_FLAG);
@@ -46,11 +48,15 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private boolean isDragging;
     private ViewPagerProvider pagerProvider;
 
-    private @SlidingMode int slidingMode;
+    private
+    @SlidingMode
+    int slidingMode;
 
     @Retention(SOURCE)
     @IntDef({SLIDING_TOWARDS_END, SLIDING_TOWARDS_START})
-    @interface SlidingMode {}
+    @interface SlidingMode {
+    }
+
     public static final int SLIDING_TOWARDS_END = 0;
     public static final int SLIDING_TOWARDS_START = 1;
 
@@ -178,11 +184,26 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         for (int iLoop = 0; iLoop < count; iLoop++) {
             dX = longOffset + (iLoop * threeRadius);
             dY = shortOffset;
+
+            if (iLoop < surfaceStart - risingCount ||
+                    iLoop > surfaceEnd + risingCount) {
+                continue;
+            }
+
             // Only paint fill if not completely transparent
             if (paintPageFill.getAlpha() > 0) {
-                canvas.drawCircle(dX, dY, radius, paintPageFill);
+                canvas.drawCircle(dX, dY, getScaledRadius(radius, iLoop, count), paintPageFill);
             }
         }
+    }
+
+    private float getScaledRadius(float radius, int position, int count) {
+        if (position < surfaceStart) {
+            return radius / (2 << (surfaceStart - position - 1));
+        } else if (position > surfaceEnd) {
+            return radius / (2 << (position - surfaceEnd - 1));
+        }
+        return radius;
     }
 
     private void drawFilledCircle(Canvas canvas, float threeRadius, float shortOffset, float longOffset) {
@@ -346,6 +367,13 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
         currentPage = position;
         invalidate();
+        if (currentPage > surfaceEnd) {
+            surfaceEnd = currentPage;
+            surfaceStart = surfaceEnd - onSurfaceCount;
+        } else if (currentPage < surfaceStart) {
+            surfaceStart = currentPage;
+            surfaceEnd = surfaceStart + onSurfaceCount;
+        }
     }
 
     /*
