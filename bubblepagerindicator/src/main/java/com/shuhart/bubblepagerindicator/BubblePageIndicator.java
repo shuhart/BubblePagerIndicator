@@ -339,27 +339,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//        position = pagerProvider.getRealPosition(position);
-//        Log.d(getClass().getSimpleName(), "onPageScrolled(position=" + position + ", positionOffset=" + positionOffset + ")");
-//        currentPage = position;
-//        pageOffset = positionOffset;
-//        invalidate();
-//        if (currentPage < position) {
-//            // sliding to the end
-//            if (positionOffset >= 0.5) {
-//                currentPage = position;
-//                pageOffset = positionOffset;
-//                invalidate();
-//            }
-//        } else if (currentPage > position) {
-//            if (positionOffset <= 0.5) {
-//                currentPage = position;
-//                pageOffset = positionOffset;
-//                invalidate();
-//            }
-//        }
-    }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
     @Override
     public void onPageSelected(int position) {
