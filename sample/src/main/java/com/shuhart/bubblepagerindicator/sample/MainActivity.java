@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ViewPager pager = findViewById(R.id.pager);
         BubblePageIndicator indicator = findViewById(R.id.indicator);
+        indicator.setMarginBetweenCircles(16);
         ViewPagerAdapter adapter = new ViewPagerAdapter();
         pager.setAdapter(adapter);
         indicator.setViewPager(pager, adapter);

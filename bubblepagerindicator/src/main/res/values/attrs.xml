@@ -4,27 +4,16 @@
         <attr name="BubblePageIndicatorDefaultStyle" format="reference" />
     </declare-styleable>
 
-    <attr name="centered" format="boolean" />
-    <attr name="selectedColor" format="color" />
-    <attr name="strokeWidth" format="dimension" />
-    <attr name="unselectedColor" format="color" />
-
     <declare-styleable name="BubblePageIndicator">
         <!-- Whether or not the indicators should be centered. -->
-        <attr name="centered" />
+        <attr name="centered" format="boolean" />
         <!-- Color of the filled circle that represents the current page. -->
         <attr name="fillColor" format="color" />
         <!-- Color of the filled circles that represents pages. -->
         <attr name="pageColor" format="color" />
-        <!-- Orientation of the indicator. -->
-        <attr name="android:orientation"/>
-        <!-- Radius of the circles. This is also the spacing between circles. -->
+        <!-- Radius of the circles. -->
         <attr name="radius" format="dimension" />
-        <!-- Color of the open circles. -->
-        <attr name="strokeColor" format="color" />
-        <!-- Width of the stroke used to draw the circles. -->
-        <attr name="strokeWidth" />
-        <!-- View background -->
-        <attr name="android:background"/>
+        <!-- Margin between the circles. -->
+        <attr name="marginBetweenCircles" format="dimension" />
     </declare-styleable>
 </resources>

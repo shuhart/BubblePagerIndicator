@@ -8,7 +8,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -18,10 +17,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
-import java.lang.annotation.Retention;
-
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Draws circles (one for each view). The current view position is filled and
@@ -37,11 +33,11 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private int surfaceStart;
     private int surfaceEnd = onSurfaceCount - 1;
     private float radius;
+    private float marginBetweenCircles;
     private final Paint paintPageFill = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintFill = new Paint(ANTI_ALIAS_FLAG);
     private ViewPager viewPager;
     private int currentPage;
-    private float pageOffset;
     private int scrollState;
     private boolean centered;
 
@@ -51,18 +47,6 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private boolean isDragging;
     private ViewPagerProvider pagerProvider;
     private ValueAnimator translationAnim;
-
-    private
-    @SlidingMode
-    int slidingMode;
-
-    @Retention(SOURCE)
-    @IntDef({SLIDING_TOWARDS_END, SLIDING_TOWARDS_START})
-    @interface SlidingMode {
-    }
-
-    public static final int SLIDING_TOWARDS_END = 0;
-    public static final int SLIDING_TOWARDS_START = 1;
 
     public BubblePageIndicator(Context context) {
         this(context, null);
@@ -92,6 +76,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         paintFill.setStyle(Style.FILL);
         paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, defaultFillColor));
         radius = a.getDimension(R.styleable.BubblePageIndicator_radius, defaultRadius);
+        marginBetweenCircles = a.getDimension(R.styleable.BubblePageIndicator_marginBetweenCircles, radius);
 
         a.recycle();
 
@@ -141,12 +126,50 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         invalidate();
     }
 
+    public void setMarginBetweenCircles(float margin) {
+        this.marginBetweenCircles = margin;
+    }
+
     public float getRadius() {
         return radius;
     }
 
     private int getRealCount() {
         return Math.min(onSurfaceCount + risingCount * 2, pagerProvider.getRealCount());
+    }
+
+    private void setUpScrollX() {
+        float longOffset = getPaddingLeft() + radius;
+        if (centered) {
+            longOffset += ((getWidth() - getPaddingLeft() - getPaddingRight()) / 2.0f) - ((getRealCount() * radius) / 2.0f);
+        }
+        longOffset = Math.max(longOffset, radius);
+        longOffset += getScrollX();
+//        Log.d(getClass().getSimpleName(), "longOffset = " + longOffset + ", scrollX = " + getScrollX());
+
+        setScrollX((int) longOffset);
+    }
+
+    private float getLongOffset() {
+        int widthNeeded = calculateExactWidth();
+        float longOffset = getPaddingLeft() + radius;
+        if (getWidth() <= widthNeeded) {
+            return longOffset;
+        }
+        if (centered) {
+            float fix = ((getWidth() - getPaddingLeft() - getPaddingRight()) / 2.0f) - ((getRealCount() * radius) / 2.0f);
+            if (getWidth() - longOffset < widthNeeded) {
+                return longOffset;
+            }
+            longOffset += fix;
+        }
+        return longOffset;
+    }
+
+    private int calculateExactWidth() {
+        int count = getRealCount();
+        return (int) (getPaddingLeft() + getPaddingRight()
+                + (count * 2 * radius) + (count - 1) * marginBetweenCircles);
     }
 
     @Override
@@ -163,34 +186,30 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
 
         int shortPaddingBefore = getPaddingTop();
-        final float threeRadius = radius * 3;
         final float shortOffset = shortPaddingBefore + radius;
-        float longOffset = getScrollX();
+        float longOffset = getLongOffset();
 
         //Draw stroked circles
-        drawStrokedCircles(canvas, count, threeRadius, shortOffset, longOffset);
+        drawStrokedCircles(canvas, count, shortOffset, longOffset);
 
         //Draw the filled circle according to the current scroll
-        drawFilledCircle(canvas, threeRadius, shortOffset, longOffset);
+        drawFilledCircle(canvas, shortOffset, longOffset);
     }
 
-    private void drawStrokedCircles(Canvas canvas, int count, float threeRadius, float shortOffset, float longOffset) {
+    private void drawStrokedCircles(Canvas canvas, int count, float shortOffset, float longOffset) {
         float dX;
-        float dY;
-
         for (int iLoop = 0; iLoop < count; iLoop++) {
             if (iLoop < surfaceStart - risingCount ||
                     iLoop > surfaceEnd + risingCount) {
                 continue;
             }
 
-            dX = longOffset + (iLoop * threeRadius);
-            dY = shortOffset;
-            Log.d(getClass().getSimpleName(), "dX = " + dX);
+            dX = longOffset + iLoop * (radius * 2 + marginBetweenCircles);
+//            Log.d(getClass().getSimpleName(), "dX = " + dX);
 
             // Only paint fill if not completely transparent
             if (paintPageFill.getAlpha() > 0) {
-                canvas.drawCircle(dX, dY, getScaledRadius(radius, iLoop, count), paintPageFill);
+                canvas.drawCircle(dX, shortOffset, getScaledRadius(radius, iLoop, count), paintPageFill);
             }
         }
     }
@@ -204,10 +223,10 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         return radius;
     }
 
-    private void drawFilledCircle(Canvas canvas, float threeRadius, float shortOffset, float longOffset) {
+    private void drawFilledCircle(Canvas canvas, float shortOffset, float longOffset) {
         float dX;
         float dY;
-        float cx = currentPage * threeRadius;
+        float cx = currentPage * (radius * 2 + marginBetweenCircles);
         dX = longOffset + cx;
         dY = shortOffset;
         canvas.drawCircle(dX, dY, radius, paintFill);
@@ -309,20 +328,8 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
         viewPager = view;
         viewPager.addOnPageChangeListener(this);
-        setUpScrollX();
+//        setUpScrollX();
         invalidate();
-    }
-
-    private void setUpScrollX() {
-        float longOffset = getPaddingLeft() + radius;
-        if (centered) {
-            longOffset += ((getWidth() - getPaddingLeft() - getPaddingRight()) / 2.0f) - ((getRealCount() * radius) / 2.0f);
-        }
-        longOffset = Math.max(longOffset, radius);
-        longOffset += getScrollX();
-        Log.d(getClass().getSimpleName(), "longOffset = " + longOffset + ", scrollX = " + getScrollX());
-
-        setScrollX((int) longOffset);
     }
 
     public void setViewPager(ViewPager view, ViewPagerProvider pagerProvider, int initialPosition) {
@@ -359,18 +366,8 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         if (position == currentPage) {
             if (positionOffset >= 0.5 && currentPage + 1 < pagerProvider.getRealCount()) {
                 currentPage += 1;
-                if (currentPage > surfaceEnd) {
-                    correctSurface();
-                    setScrollX((int) (getScrollX() + 100));
-                    getTranslationAnimation(getScrollX(), 20, new Runnable() {
-                        @Override
-                        public void run() {
-                            invalidate();
-                        }
-                    }).start();
-                } else {
-                    invalidate();
-                }
+                correctSurface();
+                invalidate();
             }
         } else if (position < currentPage) {
             if (positionOffset <= 0.5) {
@@ -452,12 +449,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             result = specSize;
         } else {
             //Calculate the width according the views count
-            int count = getRealCount();
-            int max = onSurfaceCount + risingCount * 2;
-            count = Math.min(count, max);
-            result = (int) (getPaddingLeft() + getPaddingRight()
-                    + (count * 2 * radius) + (count - 1) * radius + 1
-                    + radius * 4);
+            result = calculateExactWidth();
             //Respect AT_MOST value if that was what is called for by measureSpec
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
