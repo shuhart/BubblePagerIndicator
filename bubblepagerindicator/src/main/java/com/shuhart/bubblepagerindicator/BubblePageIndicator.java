@@ -162,19 +162,10 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             return;
         }
 
-        int longSize = getWidth();
-        int longPaddingBefore = getPaddingLeft();
-        int longPaddingAfter = getPaddingRight();
         int shortPaddingBefore = getPaddingTop();
         final float threeRadius = radius * 3;
         final float shortOffset = shortPaddingBefore + radius;
-        float longOffset = longPaddingBefore + radius;
-        if (centered) {
-            longOffset += ((longSize - longPaddingBefore - longPaddingAfter) / 2.0f) - ((count * threeRadius) / 2.0f);
-        }
-        longOffset = Math.max(longOffset, radius);
-        longOffset += getScrollX();
-        Log.d(getClass().getSimpleName(), "longOffset = " + longOffset + ", scrollX = " + getScrollX());
+        float longOffset = getScrollX();
 
         //Draw stroked circles
         drawStrokedCircles(canvas, count, threeRadius, shortOffset, longOffset);
@@ -195,6 +186,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
             dX = longOffset + (iLoop * threeRadius);
             dY = shortOffset;
+            Log.d(getClass().getSimpleName(), "dX = " + dX);
 
             // Only paint fill if not completely transparent
             if (paintPageFill.getAlpha() > 0) {
@@ -317,7 +309,20 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
         viewPager = view;
         viewPager.addOnPageChangeListener(this);
+        setUpScrollX();
         invalidate();
+    }
+
+    private void setUpScrollX() {
+        float longOffset = getPaddingLeft() + radius;
+        if (centered) {
+            longOffset += ((getWidth() - getPaddingLeft() - getPaddingRight()) / 2.0f) - ((getRealCount() * radius) / 2.0f);
+        }
+        longOffset = Math.max(longOffset, radius);
+        longOffset += getScrollX();
+        Log.d(getClass().getSimpleName(), "longOffset = " + longOffset + ", scrollX = " + getScrollX());
+
+        setScrollX((int) longOffset);
     }
 
     public void setViewPager(ViewPager view, ViewPagerProvider pagerProvider, int initialPosition) {
@@ -354,8 +359,18 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         if (position == currentPage) {
             if (positionOffset >= 0.5 && currentPage + 1 < pagerProvider.getRealCount()) {
                 currentPage += 1;
-                correctSurface();
-                invalidate();
+                if (currentPage > surfaceEnd) {
+                    correctSurface();
+                    setScrollX((int) (getScrollX() + 100));
+                    getTranslationAnimation(getScrollX(), 20, new Runnable() {
+                        @Override
+                        public void run() {
+                            invalidate();
+                        }
+                    }).start();
+                } else {
+                    invalidate();
+                }
             }
         } else if (position < currentPage) {
             if (positionOffset <= 0.5) {
@@ -369,7 +384,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private ValueAnimator getTranslationAnimation(int from, int to, final Runnable runnable) {
         if (translationAnim != null) translationAnim.cancel();
         translationAnim = ValueAnimator.ofInt(from, to);
-        translationAnim.setDuration(400);
+        translationAnim.setDuration(1000);
         translationAnim.setInterpolator(new AccelerateDecelerateInterpolator());
         translationAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
