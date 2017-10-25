@@ -1,5 +1,7 @@
 package com.shuhart.bubblepagerindicator;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import java.lang.annotation.Retention;
 
@@ -47,6 +50,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
     private int activePointerId = INVALID_POINTER;
     private boolean isDragging;
     private ViewPagerProvider pagerProvider;
+    private ValueAnimator translationAnim;
 
     private
     @SlidingMode
@@ -169,6 +173,8 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             longOffset += ((longSize - longPaddingBefore - longPaddingAfter) / 2.0f) - ((count * threeRadius) / 2.0f);
         }
         longOffset = Math.max(longOffset, radius);
+        longOffset += getScrollX();
+        Log.d(getClass().getSimpleName(), "longOffset = " + longOffset + ", scrollX = " + getScrollX());
 
         //Draw stroked circles
         drawStrokedCircles(canvas, count, threeRadius, shortOffset, longOffset);
@@ -182,13 +188,13 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         float dY;
 
         for (int iLoop = 0; iLoop < count; iLoop++) {
-            dX = longOffset + (iLoop * threeRadius);
-            dY = shortOffset;
-
             if (iLoop < surfaceStart - risingCount ||
                     iLoop > surfaceEnd + risingCount) {
                 continue;
             }
+
+            dX = longOffset + (iLoop * threeRadius);
+            dY = shortOffset;
 
             // Only paint fill if not completely transparent
             if (paintPageFill.getAlpha() > 0) {
@@ -343,8 +349,8 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        Log.d(getClass().getSimpleName(), "onPageScrolled(): position = "+ position +", currentPage = " + currentPage
-                + ", offset = " + positionOffset);
+//        Log.d(getClass().getSimpleName(), "onPageScrolled(): position = "+ position +", currentPage = " + currentPage
+//                + ", offset = " + positionOffset);
         if (position == currentPage) {
             if (positionOffset >= 0.5 && currentPage + 1 < pagerProvider.getRealCount()) {
                 currentPage += 1;
@@ -360,13 +366,37 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
         }
     }
 
+    private ValueAnimator getTranslationAnimation(int from, int to, final Runnable runnable) {
+        if (translationAnim != null) translationAnim.cancel();
+        translationAnim = ValueAnimator.ofInt(from, to);
+        translationAnim.setDuration(400);
+        translationAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+        translationAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                if (getScrollX() != val) {
+                    setScrollX(val);
+                    invalidate();
+                }
+            }
+        });
+        translationAnim.addListener(new AnimatorListener() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                if (runnable != null) runnable.run();
+            }
+        });
+        return translationAnim;
+    }
+
     private void correctSurface() {
         if (currentPage > surfaceEnd) {
             surfaceEnd = currentPage;
-            surfaceStart = surfaceEnd - onSurfaceCount;
+            surfaceStart = surfaceEnd - (onSurfaceCount - 1);
         } else if (currentPage < surfaceStart) {
             surfaceStart = currentPage;
-            surfaceEnd = surfaceStart + onSurfaceCount;
+            surfaceEnd = surfaceStart + (onSurfaceCount - 1);
         }
     }
 
@@ -376,13 +406,7 @@ public class BubblePageIndicator extends View implements ViewPager.OnPageChangeL
             position = pagerProvider.getRealPosition(position);
             Log.d(getClass().getSimpleName(), "onPageSelected(" + position + "), invalidating...");
             currentPage = position;
-            if (currentPage > surfaceEnd) {
-                surfaceEnd = currentPage;
-                surfaceStart = surfaceEnd - onSurfaceCount;
-            } else if (currentPage < surfaceStart) {
-                surfaceStart = currentPage;
-                surfaceEnd = surfaceStart + onSurfaceCount;
-            }
+            correctSurface();
             invalidate();
         }
     }
