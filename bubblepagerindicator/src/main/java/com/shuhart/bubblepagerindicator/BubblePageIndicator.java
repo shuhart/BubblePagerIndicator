@@ -180,7 +180,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         }
 
         int shortPaddingBefore = getPaddingTop();
-        final float shortOffset = shortPaddingBefore + radius;
+        final float shortOffset = shortPaddingBefore + radius + 1;
 
         //Draw stroked circles
         drawStrokedCircles(canvas, count, shortOffset, startX);
@@ -207,7 +207,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
             float scaledRadius = getScaledRadius(radius, iLoop);
             Log.d(getClass().getSimpleName(), "pos = " + iLoop + ", dX = " + dX + ", radius = " + scaledRadius
-                    + ", surfaceStart = " + surfaceStart +", surfaceEnd = " + surfaceEnd + ", startX = " + startX);
+                    + ", surfaceStart = " + surfaceStart + ", surfaceEnd = " + surfaceEnd + ", startX = " + startX);
             canvas.drawCircle(dX, shortOffset, scaledRadius, paintPageFill);
         }
     }
@@ -239,13 +239,15 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         } else if (position == currentPage) {
             // swipe left
             if (swipeDirection == SWIPE_LEFT && animationState == ANIMATE_SHIFT_LEFT) {
-                float current = radius / 2;
-                return current + (1 - offset) * current;
+                float finalRadius = radius + 1;
+                float currentRadius = radius / 2;
+                return currentRadius + (1 - offset) * (finalRadius - currentRadius);
             } else if (swipeDirection == SWIPE_RIGHT && animationState == ANIMATE_SHIFT_RIGHT) { // swipe right
-                float current = radius / 2;
-                return current + (1 - offset) * current;
+                float finalRadius = radius + 1;
+                float currentRadius = radius / 2;
+                return currentRadius + (1 - offset) * (finalRadius - currentRadius);
             } else {
-                return radius;
+                return radius + 1;
             }
         }
         return radius;
@@ -419,7 +421,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
             result = specSize;
         } else {
             //Measure the height
-            result = (int) (2 * radius + getPaddingTop() + getPaddingBottom() + 1);
+            result = (int) (2 * (radius + 1) + getPaddingTop() + getPaddingBottom());
             //Respect AT_MOST value if that was what is called for by measureSpec
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
