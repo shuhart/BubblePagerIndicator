@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:layout_margin="16dp"
+        android:layout_marginBottom="64dp"
         app:fillColor="@color/colorAccent"
         app:pageColor="@color/colorPrimary"
         app:radius="3dp" />

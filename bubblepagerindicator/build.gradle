@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/shuhart/BubblePagerIndicator'
     gitUrl = 'https://github.com/shuhart/BubblePagerIndicator.git'
 
-    libraryVersion = '0.11'
+    libraryVersion = '1.0'
 
     developerId = 'shuhart'
     developerName = 'Redrick Shuhart'
