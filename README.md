@@ -1,5 +1,28 @@
 # BubblePagerIndicator
-A view pager indicator view to deal with a large amount of pages.
+A view pager indicator view to deal with a large amount of pages. Nice scale and transition animations are supported.
 
-### Should I use it?
-Not yet.
+<img src="/images/sample.gif" alt="Sample" width="300px" />
+
+Usage
+-----
+
+1. Add jcenter() to repositories block in your gradle file.
+2. Add `compile 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0'` to your dependencies.
+2. Add `BubblePageIndicator` into your layouts or view hierarchy.
+3. Look into the sample for additional details on how to use and configure the library.
+
+Example:
+
+```xml
+<com.shuhart.bubblepagerindicator.BubblePageIndicator
+	android:id="@+id/indicator"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentBottom="true"
+	android:layout_centerInParent="true"
+	android:layout_marginBottom="64dp"
+	app:fillColor="@color/colorAccent"
+	app:pageColor="@color/colorPrimary"
+	app:radius="3dp" />
+
+```
