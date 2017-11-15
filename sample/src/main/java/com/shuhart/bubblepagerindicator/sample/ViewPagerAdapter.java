@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ViewPagerAdapter extends PagerAdapter implements ViewPagerProvider {
     private List<String> pages = new ArrayList<String>(){{
-       for (int i = 0; i < 12; i++) {
+       for (int i = 0; i < 6; i++) {
            add("PAGE " + i);
        }
     }};

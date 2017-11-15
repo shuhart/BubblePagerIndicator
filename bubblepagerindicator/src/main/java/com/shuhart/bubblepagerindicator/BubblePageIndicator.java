@@ -75,7 +75,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         paintPageFill.setColor(a.getColor(R.styleable.BubblePageIndicator_pageColor, defaultPageColor));
         paintFill.setStyle(Style.FILL);
         paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, defaultFillColor));
-        radius = a.getDimension(R.styleable.BubblePageIndicator_radius, defaultRadius) * 2;
+        radius = a.getDimension(R.styleable.BubblePageIndicator_radius, defaultRadius);
         marginBetweenCircles = a.getDimension(R.styleable.BubblePageIndicator_marginBetweenCircles, radius);
 
         a.recycle();
@@ -130,10 +130,6 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     @Override
     protected int getRealCount() {
         return pagerProvider.getRealCount();
-    }
-
-    private int getAnimatedCount() {
-        return Math.min(onSurfaceCount + risingCount * 2, pagerProvider.getRealCount());
     }
 
     @Override
@@ -200,7 +196,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
                 float currentRadius = radius / (2 << (surfaceStart - position));
                 return currentRadius + (1 - offset) * (finalRadius - currentRadius);
             } else {
-                return radius / (2 << (surfaceStart - position - 1))  + add;
+                return radius / (2 << (surfaceStart - position - 1)) + add;
             }
         } else if (position > surfaceEnd) { // circles to the right of the surface
             float add = ((position - surfaceEnd == 1) ? addRadius : 0);
@@ -366,17 +362,17 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
-        if (startX == Integer.MIN_VALUE) {
-            if (pagerProvider.getRealCount() <= onSurfaceCount) {
-                startX = (int) getLongOffset();
-            } else {
-                startX = (int) (getLongOffset() + radius * 4 + marginBetweenCircles * 2);
-            }
-        }
+        measureStartX();
     }
 
-    private float getLongOffset() {
-        return getPaddingLeft() + radius;
+    private void measureStartX() {
+        if (startX == Integer.MIN_VALUE) {
+            if (pagerProvider.getRealCount() <= onSurfaceCount) {
+                startX = (int) (getPaddingLeft() + radius);
+            } else {
+                startX = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2);
+            }
+        }
     }
 
     private int measureWidth(int measureSpec) {
@@ -399,9 +395,21 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private int calculateExactWidth() {
-        int count = getAnimatedCount();
-        return (int) (getPaddingLeft() + getPaddingRight()
-                + (count * 2 * radius) + (count - 1) * marginBetweenCircles);
+        int count = pagerProvider.getRealCount();
+        int maxCount = onSurfaceCount + risingCount * 2;
+        int diff = maxCount - count;
+        float width;
+        if (diff <= 1) {
+            width = getPaddingLeft() + getPaddingRight()
+                    + (maxCount * 2 * radius) + (maxCount - 1) * marginBetweenCircles;
+        } else {
+            width = getPaddingLeft() + getPaddingRight()
+                    + (count * 2 * radius) + (count - 1) * marginBetweenCircles;
+            if (count > onSurfaceCount) {
+                width += radius * 2 + marginBetweenCircles * 2;
+            }
+        }
+        return (int) width;
     }
 
     private int measureHeight(int measureSpec) {
