@@ -5,8 +5,6 @@
     </declare-styleable>
 
     <declare-styleable name="BubblePageIndicator">
-        <!-- Whether or not the indicators should be centered. -->
-        <attr name="centered" format="boolean" />
         <!-- Color of the filled circle that represents the current page. -->
         <attr name="fillColor" format="color" />
         <!-- Color of the filled circles that represents pages. -->

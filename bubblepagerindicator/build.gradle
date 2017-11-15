@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/shuhart/BubblePagerIndicator'
     gitUrl = 'https://github.com/shuhart/BubblePagerIndicator.git'
 
-    libraryVersion = '1.0'
+    libraryVersion = '1.0.1'
 
     developerId = 'shuhart'
     developerName = 'Redrick Shuhart'
@@ -62,7 +62,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.0.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     testCompile 'junit:junit:4.12'
 }
 
