@@ -250,7 +250,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         }
         viewPager = view;
         viewPager.addOnPageChangeListener(this);
-        invalidate();
+        forceLayout();
     }
 
     public void setViewPager(ViewPager view, ViewPagerProvider pagerProvider, int initialPosition) {
