@@ -7,7 +7,7 @@ Usage
 -----
 
 1. Add jcenter() to repositories block in your gradle file.
-2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0.5'` to your dependencies.
+2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0.6'` to your dependencies.
 2. Add `BubblePageIndicator` into your layouts or view hierarchy.
 3. Look into the sample for additional details on how to use and configure the library.
 
