@@ -56,9 +56,58 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     private DataSetObserver dataSetObserver = new DataSetObserver() {
         @Override
         public void onChanged() {
+            ensureState();
             forceLayoutChanges();
         }
     };
+
+    private void ensureState() {
+        // When data is changed onPageSelected() is called only
+        // if we were on the last page of the ViewPager.
+        // Otherwise we should check the inconsistency manually.
+//        if (currentPage >= getCount() || surfaceEnd >= getCount()) {
+//            int oldSurfaceStart = surfaceStart;
+//            int oldSurfaceEnd = surfaceEnd;
+//            correctSurfaceIfDataSetChanges();
+//            if (currentPage >= getCount()) {
+//                currentPage = getCount() - 1;
+//            }
+//            correctStartXOnDataSetChanges(oldSurfaceStart, oldSurfaceEnd);
+//        }
+        int oldSurfaceStart = surfaceStart;
+        int oldSurfaceEnd = surfaceEnd;
+        correctSurfaceIfDataSetChanges();
+        if (currentPage >= getCount()) {
+            currentPage = getCount() - 1;
+        }
+        correctStartXOnDataSetChanges(oldSurfaceStart, oldSurfaceEnd);
+    }
+
+    private void correctSurfaceIfDataSetChanges() {
+        if (surfaceEnd > getCount() - 1) {
+            if (getCount() > onSurfaceCount) {
+                surfaceEnd = getCount() - 1;
+                surfaceStart = surfaceEnd - (onSurfaceCount - 1);
+            } else {
+                surfaceEnd = onSurfaceCount - 1;
+                surfaceStart = 0;
+            }
+        }
+    }
+
+    private void correctStartXOnDataSetChanges(int oldSurfaceStart, int oldSurfaceEnd) {
+        int initial = getInitialStartX();
+        if (startX == initial) {
+            return;
+        }
+        if (surfaceEnd > onSurfaceCount - 1) {
+            initial -= (surfaceEnd - (onSurfaceCount - 1)) * (marginBetweenCircles + radius * 2);
+            if (getCount() - onSurfaceCount <= 1) {
+                initial -= marginBetweenCircles + radius * 2;
+            }
+        }
+        startX = initial;
+    }
 
     public BubblePageIndicator(Context context) {
         this(context, null);
@@ -77,7 +126,6 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         final int defaultPageColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_page_color);
         final int defaultFillColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_fill_color);
         final float defaultRadius = res.getDimension(R.dimen.default_bubble_indicator_radius);
-        final boolean defaultCentered = res.getBoolean(R.bool.default_bubble_indicator_centered);
 
         //Retrieve styles attributes
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubblePageIndicator, defStyle, 0);
@@ -266,11 +314,17 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     @Override
     public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
+        resetStartX();
         forceLayoutChanges();
     }
 
+    private void resetStartX() {
+        startX = Integer.MIN_VALUE;
+        measureStartX();
+    }
+
     private void forceLayoutChanges() {
-        forceLayout();
+        requestLayout();
         invalidate();
     }
 
@@ -287,8 +341,6 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
             return;
         }
         viewPager.setCurrentItem(item);
-        currentPage = item;
-        invalidate();
     }
 
     public void notifyDataSetChanged() {
@@ -302,6 +354,12 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        if (Math.abs(viewPager.getCurrentItem() - position) > 1) {
+            // Inconsistency detected.
+            // Probably we changed a page manually
+            onPageManuallyChanged(viewPager.getCurrentItem());
+            return;
+        }
         if (position == currentPage) {
             if (positionOffset >= 0.5 && currentPage + 1 < getCount()) {
                 swipeDirection = SWIPE_LEFT;
@@ -370,12 +428,42 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     @Override
-    public void onPageSelected(int position) {
+    public void onPageSelected(final int position) {
         if (scrollState == ViewPager.SCROLL_STATE_IDLE) {
-            currentPage = position;
-            correctSurface();
-            invalidate();
+            if (startX == Integer.MIN_VALUE) {
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onPageManuallyChanged(position);
+                    }
+                });
+            } else {
+                onPageManuallyChanged(position);
+            }
         }
+    }
+
+    private void onPageManuallyChanged(int position) {
+        currentPage = position;
+        int oldSurfaceStart = surfaceStart;
+        int oldSurfaceEnd = surfaceEnd;
+        correctSurface();
+        correctStartXOnPageManuallyChanged(oldSurfaceStart, oldSurfaceEnd);
+        invalidate();
+    }
+
+    private void correctStartXOnPageManuallyChanged(int oldSurfaceStart, int oldSurfaceEnd) {
+        if (currentPage >= oldSurfaceStart && currentPage <= oldSurfaceEnd) {
+            // startX is not changed
+            return;
+        }
+        int corrected = startX;
+        if (currentPage < oldSurfaceStart) {
+            corrected += (oldSurfaceStart - currentPage) * (marginBetweenCircles + radius * 2);
+        } else {
+            corrected -= (currentPage - oldSurfaceEnd) * (marginBetweenCircles + radius * 2);
+        }
+        startX = corrected;
     }
 
     @Override
@@ -386,12 +474,18 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     private void measureStartX() {
         if (startX == Integer.MIN_VALUE) {
-            if (getCount() <= onSurfaceCount) {
-                startX = (int) (getPaddingLeft() + radius);
-            } else {
-                startX = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2);
-            }
+            startX = getInitialStartX();
         }
+    }
+
+    private int getInitialStartX() {
+        int result;
+        if (getCount() <= onSurfaceCount) {
+            result = (int) (getPaddingLeft() + radius);
+        } else {
+            result = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2);
+        }
+        return result;
     }
 
     private int measureWidth(int measureSpec) {

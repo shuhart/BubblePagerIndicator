@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">BubblePagerIndicatorView</string>
+    <string name="set_a_page">Set a page</string>
+    <string name="new_refreshed_pages_amount">New refreshed pages amount</string>
+    <string name="default_refresh_pages_count">7</string>
 </resources>

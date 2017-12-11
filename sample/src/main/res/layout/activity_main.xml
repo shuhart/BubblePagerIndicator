@@ -2,31 +2,81 @@
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_refresh_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/swipe_refresh_layout">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".MainActivity">
+
+        <RelativeLayout
+            android:id="@+id/buttonPanel1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/edittext_page_number"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="@string/default_refresh_pages_count"/>
+
+            <Button
+                android:id="@+id/btn_page_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/edittext_page_number"
+                android:layout_toRightOf="@id/edittext_page_number"
+                android:text="@string/set_a_page"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/buttonPanel2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_below="@+id/buttonPanel1">
+
+            <EditText
+                android:id="@+id/edittext_refresh_count"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="@string/default_refresh_pages_count"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/edittext_refresh_count"
+                android:layout_toRightOf="@id/edittext_refresh_count"
+                android:text="@string/new_refreshed_pages_amount"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
 
         <com.shuhart.bubblepagerindicator.BubblePageIndicator
             android:id="@+id/indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerInParent="true"
             android:layout_marginBottom="64dp"
             app:fillColor="@color/colorAccent"
             app:pageColor="@color/colorPrimary"
-            app:radius="3dp" />
+            app:radius="3dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
 
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/indicator" />
+            android:layout_below="@id/buttonPanel2"
+            android:layout_above="@id/indicator"/>
+
 
     </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
