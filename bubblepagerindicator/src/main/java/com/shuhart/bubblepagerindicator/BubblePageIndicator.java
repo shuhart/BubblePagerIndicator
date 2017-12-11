@@ -5,17 +5,22 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
-public class BubblePageIndicator extends MotionIndicator implements ViewPager.OnPageChangeListener {
+public class BubblePageIndicator extends MotionIndicator implements ViewPager.OnPageChangeListener,
+        ViewPager.OnAdapterChangeListener {
     private static final long ANIMATION_TIME = 300;
     private static final int SWIPE_RIGHT = 1000;
     private static final int SWIPE_LEFT = 1001;
@@ -40,7 +45,6 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     private int scrollState;
     private float addRadius = ADD_RADIUS_DEFAULT;
 
-    private ViewPagerProvider pagerProvider;
     private ValueAnimator translationAnim;
 
     private int startX = Integer.MIN_VALUE;
@@ -48,6 +52,62 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     private int swipeDirection;
     private int animationState = ANIMATE_IDLE;
+
+    private DataSetObserver dataSetObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            ensureState();
+            forceLayoutChanges();
+        }
+    };
+
+    private void ensureState() {
+        // When data is changed onPageSelected() is called only
+        // if we were on the last page of the ViewPager.
+        // Otherwise we should check the inconsistency manually.
+//        if (currentPage >= getCount() || surfaceEnd >= getCount()) {
+//            int oldSurfaceStart = surfaceStart;
+//            int oldSurfaceEnd = surfaceEnd;
+//            correctSurfaceIfDataSetChanges();
+//            if (currentPage >= getCount()) {
+//                currentPage = getCount() - 1;
+//            }
+//            correctStartXOnDataSetChanges(oldSurfaceStart, oldSurfaceEnd);
+//        }
+        int oldSurfaceStart = surfaceStart;
+        int oldSurfaceEnd = surfaceEnd;
+        correctSurfaceIfDataSetChanges();
+        if (currentPage >= getCount()) {
+            currentPage = getCount() - 1;
+        }
+        correctStartXOnDataSetChanges(oldSurfaceStart, oldSurfaceEnd);
+    }
+
+    private void correctSurfaceIfDataSetChanges() {
+        if (surfaceEnd > getCount() - 1) {
+            if (getCount() > onSurfaceCount) {
+                surfaceEnd = getCount() - 1;
+                surfaceStart = surfaceEnd - (onSurfaceCount - 1);
+            } else {
+                surfaceEnd = onSurfaceCount - 1;
+                surfaceStart = 0;
+            }
+        }
+    }
+
+    private void correctStartXOnDataSetChanges(int oldSurfaceStart, int oldSurfaceEnd) {
+        int initial = getInitialStartX();
+        if (startX == initial) {
+            return;
+        }
+        if (surfaceEnd > onSurfaceCount - 1) {
+            initial -= (surfaceEnd - (onSurfaceCount - 1)) * (marginBetweenCircles + radius * 2);
+            if (getCount() - onSurfaceCount <= 1) {
+                initial -= marginBetweenCircles + radius * 2;
+            }
+        }
+        startX = initial;
+    }
 
     public BubblePageIndicator(Context context) {
         this(context, null);
@@ -66,7 +126,6 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         final int defaultPageColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_page_color);
         final int defaultFillColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_fill_color);
         final float defaultRadius = res.getDimension(R.dimen.default_bubble_indicator_radius);
-        final boolean defaultCentered = res.getBoolean(R.bool.default_bubble_indicator_centered);
 
         //Retrieve styles attributes
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubblePageIndicator, defStyle, 0);
@@ -128,8 +187,8 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     @Override
-    protected int getRealCount() {
-        return pagerProvider.getRealCount();
+    protected int getCount() {
+        return viewPager.getAdapter().getCount();
     }
 
     @Override
@@ -150,7 +209,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
             return;
         }
 
-        final int count = getRealCount();
+        final int count = getCount();
         if (count == 0 || count == 1) {
             return;
         }
@@ -237,25 +296,40 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         canvas.drawCircle(dX, dY, getScaledRadius(radius, currentPage), paintFill);
     }
 
-    public void setViewPager(ViewPager view, ViewPagerProvider pagerProvider) {
-        this.pagerProvider = pagerProvider;
-        if (viewPager == view) {
-            return;
-        }
+    public void setViewPager(@NonNull ViewPager view) {
         if (viewPager != null) {
             viewPager.removeOnPageChangeListener(this);
+            viewPager.removeOnAdapterChangeListener(this);
+            viewPager.getAdapter().unregisterDataSetObserver(dataSetObserver);
         }
         if (view.getAdapter() == null) {
             throw new IllegalStateException("ViewPager does not have adapter instance.");
         }
         viewPager = view;
+        viewPager.getAdapter().registerDataSetObserver(dataSetObserver);
+        viewPager.addOnAdapterChangeListener(this);
         viewPager.addOnPageChangeListener(this);
-        requestLayout();
+        forceLayoutChanges();
     }
 
-    public void setViewPager(ViewPager view, ViewPagerProvider pagerProvider, int initialPosition) {
-        setViewPager(view, pagerProvider);
-        initialPosition = pagerProvider.getRealPosition(initialPosition);
+    @Override
+    public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
+        resetStartX();
+        forceLayoutChanges();
+    }
+
+    private void resetStartX() {
+        startX = Integer.MIN_VALUE;
+        measureStartX();
+    }
+
+    private void forceLayoutChanges() {
+        requestLayout();
+        invalidate();
+    }
+
+    public void setViewPager(ViewPager view, int initialPosition) {
+        setViewPager(view);
         setCurrentItem(initialPosition);
     }
 
@@ -263,16 +337,14 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         if (viewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
         }
-        if (item < 0 || item > pagerProvider.getRealCount()) {
+        if (item < 0 || item > getCount()) {
             return;
         }
         viewPager.setCurrentItem(item);
-        currentPage = item;
-        invalidate();
     }
 
     public void notifyDataSetChanged() {
-        invalidate();
+        forceLayoutChanges();
     }
 
     @Override
@@ -282,8 +354,14 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        if (Math.abs(viewPager.getCurrentItem() - position) > 1) {
+            // Inconsistency detected.
+            // Probably we changed a page manually
+            onPageManuallyChanged(viewPager.getCurrentItem());
+            return;
+        }
         if (position == currentPage) {
-            if (positionOffset >= 0.5 && currentPage + 1 < pagerProvider.getRealCount()) {
+            if (positionOffset >= 0.5 && currentPage + 1 < getCount()) {
                 swipeDirection = SWIPE_LEFT;
                 currentPage += 1;
                 if (currentPage > surfaceEnd) {
@@ -350,13 +428,42 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     @Override
-    public void onPageSelected(int position) {
+    public void onPageSelected(final int position) {
         if (scrollState == ViewPager.SCROLL_STATE_IDLE) {
-            position = pagerProvider.getRealPosition(position);
-            currentPage = position;
-            correctSurface();
-            invalidate();
+            if (startX == Integer.MIN_VALUE) {
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onPageManuallyChanged(position);
+                    }
+                });
+            } else {
+                onPageManuallyChanged(position);
+            }
         }
+    }
+
+    private void onPageManuallyChanged(int position) {
+        currentPage = position;
+        int oldSurfaceStart = surfaceStart;
+        int oldSurfaceEnd = surfaceEnd;
+        correctSurface();
+        correctStartXOnPageManuallyChanged(oldSurfaceStart, oldSurfaceEnd);
+        invalidate();
+    }
+
+    private void correctStartXOnPageManuallyChanged(int oldSurfaceStart, int oldSurfaceEnd) {
+        if (currentPage >= oldSurfaceStart && currentPage <= oldSurfaceEnd) {
+            // startX is not changed
+            return;
+        }
+        int corrected = startX;
+        if (currentPage < oldSurfaceStart) {
+            corrected += (oldSurfaceStart - currentPage) * (marginBetweenCircles + radius * 2);
+        } else {
+            corrected -= (currentPage - oldSurfaceEnd) * (marginBetweenCircles + radius * 2);
+        }
+        startX = corrected;
     }
 
     @Override
@@ -367,12 +474,18 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     private void measureStartX() {
         if (startX == Integer.MIN_VALUE) {
-            if (pagerProvider.getRealCount() <= onSurfaceCount) {
-                startX = (int) (getPaddingLeft() + radius);
-            } else {
-                startX = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2);
-            }
+            startX = getInitialStartX();
         }
+    }
+
+    private int getInitialStartX() {
+        int result;
+        if (getCount() <= onSurfaceCount) {
+            result = (int) (getPaddingLeft() + radius);
+        } else {
+            result = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2);
+        }
+        return result;
     }
 
     private int measureWidth(int measureSpec) {
@@ -395,7 +508,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private int calculateExactWidth() {
-        int count = pagerProvider.getRealCount();
+        int count = getCount();
         int maxCount = onSurfaceCount + risingCount * 2;
         int diff = maxCount - count;
         float width;

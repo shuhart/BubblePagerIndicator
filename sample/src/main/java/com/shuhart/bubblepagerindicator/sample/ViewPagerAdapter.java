@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.shuhart.bubblepagerindicator.ViewPagerProvider;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +14,13 @@ import java.util.List;
  * on 10/19/2017, 11:47 AM.
  */
 
-public class ViewPagerAdapter extends PagerAdapter implements ViewPagerProvider {
-    private List<String> pages = new ArrayList<String>(){{
-       for (int i = 0; i < 12; i++) {
-           add("PAGE " + i);
-       }
-    }};
+public class ViewPagerAdapter extends PagerAdapter {
+    private List<String> pages = new ArrayList<>();
+
+    public void setPages(List<String> pages) {
+        this.pages = pages;
+        notifyDataSetChanged();
+    }
 
 
     @Override
@@ -46,15 +45,5 @@ public class ViewPagerAdapter extends PagerAdapter implements ViewPagerProvider 
         view.setGravity(Gravity.CENTER);
         container.addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return view;
-    }
-
-    @Override
-    public int getRealCount() {
-        return getCount();
-    }
-
-    @Override
-    public int getRealPosition(int position) {
-        return position;
     }
 }

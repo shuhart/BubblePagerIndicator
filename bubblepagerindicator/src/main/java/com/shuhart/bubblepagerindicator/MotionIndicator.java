@@ -37,13 +37,13 @@ abstract class MotionIndicator extends View {
         touchSlop = configuration.getScaledPagingTouchSlop();
     }
 
-    protected abstract int getRealCount();
+    protected abstract int getCount();
 
     public boolean onTouchEvent(MotionEvent ev) {
         if (super.onTouchEvent(ev)) {
             return true;
         }
-        if ((viewPager == null) || (getRealCount() == 0)) {
+        if ((viewPager == null) || (getCount() == 0)) {
             return false;
         }
 
@@ -78,7 +78,7 @@ abstract class MotionIndicator extends View {
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 if (!isDragging) {
-                    final int count = getRealCount();
+                    final int count = getCount();
                     final int width = getWidth();
                     final float halfWidth = width / 2f;
                     final float sixthWidth = width / 6f;

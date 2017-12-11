@@ -2,7 +2,6 @@
 <resources>
     <color name="default_bubble_indicator_fill_color">#FFFFFFFF</color>
     <color name="default_bubble_indicator_page_color">#00000000</color>
-    <bool name="default_bubble_indicator_centered">true</bool>
     <dimen name="default_bubble_indicator_radius">3dp</dimen>
     <dimen name="default_bubble_indicator_stroke_width">1dp</dimen>
 </resources>
