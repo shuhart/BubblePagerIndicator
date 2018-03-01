@@ -3,4 +3,8 @@
     <string name="set_a_page">Set a page</string>
     <string name="new_refreshed_pages_amount">New refreshed pages amount</string>
     <string name="default_refresh_pages_count">7</string>
+    <string name="title_activity_blank">BlankActivity</string>
+    <string name="next_screen">Blank screen</string>
+    <string name="on_surface_count">On surface count</string>
+    <string name="default_on_surface_count">5</string>
 </resources>

@@ -12,10 +12,36 @@
         android:orientation="vertical"
         tools:context=".MainActivity">
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <com.shuhart.bubblepagerindicator.BubblePageIndicator
+            android:id="@+id/indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            app:fillColor="@color/colorAccent"
+            app:pageColor="@color/colorPrimary"
+            android:layout_below="@id/pager"
+            app:radius="8dp" />
+
+        <Button
+            android:id="@+id/next_screen_btn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/next_screen"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/indicator"/>
+
         <RelativeLayout
             android:id="@+id/buttonPanel1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/next_screen_btn"
             android:padding="16dp">
 
             <EditText
@@ -23,7 +49,7 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:text="@string/default_refresh_pages_count"/>
+                android:text="@string/default_refresh_pages_count" />
 
             <Button
                 android:id="@+id/btn_page_number"
@@ -31,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/edittext_page_number"
                 android:layout_toRightOf="@id/edittext_page_number"
-                android:text="@string/set_a_page"/>
+                android:text="@string/set_a_page" />
 
         </RelativeLayout>
 
@@ -39,43 +65,49 @@
             android:id="@+id/buttonPanel2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:layout_below="@+id/buttonPanel1">
+            android:layout_below="@+id/buttonPanel1"
+            android:padding="16dp">
 
             <EditText
                 android:id="@+id/edittext_refresh_count"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:text="@string/default_refresh_pages_count"/>
+                android:text="@string/default_refresh_pages_count" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/edittext_refresh_count"
                 android:layout_toRightOf="@id/edittext_refresh_count"
-                android:text="@string/new_refreshed_pages_amount"
-                android:layout_centerVertical="true"/>
+                android:text="@string/new_refreshed_pages_amount" />
 
         </RelativeLayout>
 
-        <com.shuhart.bubblepagerindicator.BubblePageIndicator
-            android:id="@+id/indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="64dp"
-            app:fillColor="@color/colorAccent"
-            app:pageColor="@color/colorPrimary"
-            app:radius="3dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"/>
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
+        <RelativeLayout
+            android:id="@+id/buttonPanel3"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/buttonPanel2"
-            android:layout_above="@id/indicator"/>
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/buttonPanel2"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/edittext_on_surface_count"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="@string/default_on_surface_count" />
+
+            <Button
+                android:id="@+id/btn_on_surface_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/edittext_on_surface_count"
+                android:layout_toRightOf="@id/edittext_on_surface_count"
+                android:text="@string/on_surface_count" />
+
+        </RelativeLayout>
 
 
     </RelativeLayout>

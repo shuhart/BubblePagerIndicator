@@ -62,18 +62,6 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     };
 
     private void ensureState() {
-        // When data is changed onPageSelected() is called only
-        // if we were on the last page of the ViewPager.
-        // Otherwise we should check the inconsistency manually.
-//        if (currentPage >= getCount() || surfaceEnd >= getCount()) {
-//            int oldSurfaceStart = surfaceStart;
-//            int oldSurfaceEnd = surfaceEnd;
-//            correctSurfaceIfDataSetChanges();
-//            if (currentPage >= getCount()) {
-//                currentPage = getCount() - 1;
-//            }
-//            correctStartXOnDataSetChanges(oldSurfaceStart, oldSurfaceEnd);
-//        }
         int oldSurfaceStart = surfaceStart;
         int oldSurfaceEnd = surfaceEnd;
         correctSurfaceIfDataSetChanges();
@@ -84,6 +72,10 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private void correctSurfaceIfDataSetChanges() {
+        if (onSurfaceCount != surfaceEnd - surfaceStart) {
+            surfaceStart = currentPage;
+            surfaceEnd = surfaceStart + onSurfaceCount - 1;
+        }
         if (surfaceEnd > getCount() - 1) {
             if (getCount() > onSurfaceCount) {
                 surfaceEnd = getCount() - 1;
@@ -147,6 +139,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     public void setOnSurfaceCount(int onSurfaceCount) {
         this.onSurfaceCount = onSurfaceCount;
+        ensureState();
         invalidate();
     }
 
