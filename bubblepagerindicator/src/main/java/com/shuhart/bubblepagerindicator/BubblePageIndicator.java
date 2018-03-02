@@ -72,7 +72,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private void correctSurfaceIfDataSetChanges() {
-        if (onSurfaceCount != surfaceEnd - surfaceStart) {
+        if (onSurfaceCount != surfaceEnd - surfaceStart + 1) {
             surfaceStart = currentPage;
             surfaceEnd = surfaceStart + onSurfaceCount - 1;
         }
