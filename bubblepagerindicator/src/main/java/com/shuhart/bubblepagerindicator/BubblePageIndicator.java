@@ -134,18 +134,18 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     public void setAddRadius(float value) {
         addRadius = value;
-        invalidate();
+        forceLayoutChanges();
     }
 
     public void setOnSurfaceCount(int onSurfaceCount) {
         this.onSurfaceCount = onSurfaceCount;
         ensureState();
-        invalidate();
+        forceLayoutChanges();
     }
 
     public void setRisingCount(int risingCount) {
         this.risingCount = risingCount;
-        invalidate();
+        forceLayoutChanges();
     }
 
     public void setPageColor(int pageColor) {
@@ -168,7 +168,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     public void setRadius(float radius) {
         this.radius = radius;
-        invalidate();
+        forceLayoutChanges();
     }
 
     public void setMarginBetweenCircles(float margin) {
