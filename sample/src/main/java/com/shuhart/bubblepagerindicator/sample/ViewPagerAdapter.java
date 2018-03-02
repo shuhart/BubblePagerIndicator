@@ -19,7 +19,6 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     public void setPages(List<String> pages) {
         this.pages = pages;
-        notifyDataSetChanged();
     }
 
 

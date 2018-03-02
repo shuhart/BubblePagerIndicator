@@ -13,6 +13,9 @@ import com.shuhart.bubblepagerindicator.BubblePageIndicator;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    ViewPager pager;
+    BubblePageIndicator indicator;
+    ViewPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,18 +24,11 @@ public class MainActivity extends AppCompatActivity {
         final EditText editTextPageNumber = findViewById(R.id.edittext_page_number);
         final EditText editTextRefreshPagesCount = findViewById(R.id.edittext_refresh_count);
         final EditText editTextOnSurfaceCount = findViewById(R.id.edittext_on_surface_count);
-        final ViewPager pager = findViewById(R.id.pager);
-        final BubblePageIndicator indicator = findViewById(R.id.indicator);
-        final ViewPagerAdapter adapter = new ViewPagerAdapter();
+        pager = findViewById(R.id.pager);
+        indicator = findViewById(R.id.indicator);
+        adapter = new ViewPagerAdapter();
         pager.setAdapter(adapter);
         indicator.setViewPager(pager);
-        adapter.setPages(new ArrayList<String>() {{
-            for (int i = 0; i < 10; i++) {
-                add("Item " + i);
-            }
-        }});
-        pager.setCurrentItem(9);
-//        indicator.setCurrentItem(9);
         final SwipeRefreshLayout refreshLayout = findViewById(R.id.swipe_refresh_layout);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -42,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 final int pagesCount = Integer.parseInt(number);
-//                pager.setAdapter(adapter);
-//                indicator.setViewPager(pager);
                 adapter.setPages(new ArrayList<String>() {{
                     for (int i = 0; i < pagesCount; i++) {
                         add("Item " + i);
@@ -77,6 +71,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, BlankActivity.class));
             }
         });
-        indicator.setOnSurfaceCount(1);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        adapter.setPages(new ArrayList<String>() {{
+            for (int i = 0; i < 10; i++) {
+                add("Item " + i);
+            }
+        }});
+        adapter.notifyDataSetChanged();
     }
 }

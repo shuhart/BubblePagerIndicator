@@ -224,6 +224,8 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         }
         float dX;
         for (int iLoop = 0; iLoop < count; iLoop++) {
+            if (iLoop < surfaceStart - risingCount) continue;
+            if (iLoop > surfaceEnd + risingCount) return;
             dX = startX + iLoop * (radius * 2 + marginBetweenCircles);
 
             if (dX < 0 || dX > getWidth()) continue;
@@ -337,6 +339,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     public void notifyDataSetChanged() {
+        ensureState();
         forceLayoutChanges();
     }
 
