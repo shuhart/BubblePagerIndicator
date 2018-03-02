@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ViewPagerAdapter();
         pager.setAdapter(adapter);
         indicator.setViewPager(pager);
+        indicator.setOnSurfaceCount(3);
         final SwipeRefreshLayout refreshLayout = findViewById(R.id.swipe_refresh_layout);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

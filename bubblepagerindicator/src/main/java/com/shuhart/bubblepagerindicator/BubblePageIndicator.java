@@ -62,13 +62,11 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     };
 
     private void ensureState() {
-        int oldSurfaceStart = surfaceStart;
-        int oldSurfaceEnd = surfaceEnd;
         correctSurfaceIfDataSetChanges();
-        if (currentPage >= getCount()) {
+        if (currentPage >= getCount() && getCount() != 0) {
             currentPage = getCount() - 1;
         }
-        correctStartXOnDataSetChanges(oldSurfaceStart, oldSurfaceEnd);
+        correctStartXOnDataSetChanges();
     }
 
     private void correctSurfaceIfDataSetChanges() {
@@ -76,6 +74,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
             surfaceStart = currentPage;
             surfaceEnd = surfaceStart + onSurfaceCount - 1;
         }
+        if (getCount() == 0) return;
         if (surfaceEnd > getCount() - 1) {
             if (getCount() > onSurfaceCount) {
                 surfaceEnd = getCount() - 1;
@@ -87,7 +86,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         }
     }
 
-    private void correctStartXOnDataSetChanges(int oldSurfaceStart, int oldSurfaceEnd) {
+    private void correctStartXOnDataSetChanges() {
         int initial = getInitialStartX();
         if (startX == initial) {
             return;
