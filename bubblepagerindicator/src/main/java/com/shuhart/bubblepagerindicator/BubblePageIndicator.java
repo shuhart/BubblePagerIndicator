@@ -173,6 +173,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     public void setMarginBetweenCircles(float margin) {
         this.marginBetweenCircles = margin;
+        forceLayoutChanges();
     }
 
     public float getRadius() {
