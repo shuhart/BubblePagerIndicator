@@ -87,6 +87,9 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private void correctStartXOnDataSetChanges() {
+        if (startX == Integer.MIN_VALUE) {
+            return;
+        }
         int initial = getInitialStartX();
         if (startX == initial) {
             return;
@@ -309,13 +312,8 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     @Override
     public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
-        resetStartX();
-        forceLayoutChanges();
-    }
-
-    private void resetStartX() {
         startX = Integer.MIN_VALUE;
-        measureStartX();
+        forceLayoutChanges();
     }
 
     private void forceLayoutChanges() {
@@ -479,7 +477,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         if (getCount() <= onSurfaceCount) {
             result = (int) (getPaddingLeft() + radius);
         } else {
-            result = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2);
+            result = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2 + radius);
         }
         return result;
     }
