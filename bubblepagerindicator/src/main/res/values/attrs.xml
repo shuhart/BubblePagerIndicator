@@ -3,18 +3,18 @@
 
     <declare-styleable name="BubblePageIndicator">
         <!-- Color of the filled circle that represents the current page. -->
-        <attr name="fillColor" format="color" />
+        <attr name="bpi_fillColor" format="color" />
         <!-- Color of the filled circles that represents pages. -->
-        <attr name="pageColor" format="color" />
+        <attr name="bpi_pageColor" format="color" />
         <!-- Radius of the circles. -->
-        <attr name="radius" format="dimension" />
+        <attr name="bpi_radius" format="dimension" />
         <!-- Margin between the circles. -->
-        <attr name="marginBetweenCircles" format="dimension" />
+        <attr name="bpi_marginBetweenCircles" format="dimension" />
         <!-- On surface circles count -->
-        <attr name="onSurfaceCount" format="integer" />
+        <attr name="bpi_onSurfaceCount" format="integer" />
         <!-- Rising circles count -->
-        <attr name="risingCount" format="integer" />
+        <attr name="bpi_risingCount" format="integer" />
         <!-- Default style -->
-        <attr name="indicatorStyle" format="reference" />
+        <attr name="bpi_indicatorStyle" format="reference" />
     </declare-styleable>
 </resources>

@@ -69,16 +69,6 @@ public class MainActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         });
-        indicator.setOnSurfaceCount(3);
-        indicator.setRisingCount(2);
-        // resolved color
-        indicator.setFillColor(ContextCompat.getColor(this, R.color.colorAccent));
-        // resolved color
-        indicator.setPageColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        // in px
-        indicator.setRadius(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_radius));
-        // in px
-        indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_circles_margin));
     }
 
     @Override

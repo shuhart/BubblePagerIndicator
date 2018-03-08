@@ -21,12 +21,12 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="32dp"
         android:layout_marginTop="32dp"
-        app:fillColor="@color/colorAccent"
-        app:pageColor="@color/colorPrimary"
-        app:radius="8dp"
-        app:marginBetweenCircles="6dp"
-        app:onSurfaceCount="@integer/default_bubble_indicator_on_surface_count"
-        app:risingCount="@integer/default_bubble_indicator_rising_count"/>
+        app:bpi_fillColor="@color/colorAccent"
+        app:bpi_pageColor="@color/colorPrimary"
+        app:bpi_radius="8dp"
+        app:bpi_marginBetweenCircles="6dp"
+        app:bpi_onSurfaceCount="@integer/default_bubble_indicator_on_surface_count"
+        app:bpi_risingCount="@integer/default_bubble_indicator_rising_count"/>
 
     <Button
         android:id="@+id/next_screen_btn"

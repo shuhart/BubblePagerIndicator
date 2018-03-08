@@ -105,7 +105,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     public BubblePageIndicator(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.indicatorStyle);
+        this(context, attrs, R.attr.bpi_indicatorStyle);
     }
 
     public BubblePageIndicator(Context context, AttributeSet attrs, int defStyle) {
@@ -116,13 +116,13 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubblePageIndicator, defStyle, 0);
 
         paintPageFill.setStyle(Style.FILL);
-        paintPageFill.setColor(a.getColor(R.styleable.BubblePageIndicator_pageColor, 0));
+        paintPageFill.setColor(a.getColor(R.styleable.BubblePageIndicator_bpi_pageColor, 0));
         paintFill.setStyle(Style.FILL);
-        paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, 0));
-        radius = a.getDimensionPixelSize(R.styleable.BubblePageIndicator_radius, 0);
-        marginBetweenCircles = a.getDimensionPixelSize(R.styleable.BubblePageIndicator_marginBetweenCircles, 0);
-        onSurfaceCount = a.getInteger(R.styleable.BubblePageIndicator_onSurfaceCount, 0);
-        risingCount = a.getInteger(R.styleable.BubblePageIndicator_risingCount, 0);
+        paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_bpi_fillColor, 0));
+        radius = a.getDimensionPixelSize(R.styleable.BubblePageIndicator_bpi_radius, 0);
+        marginBetweenCircles = a.getDimensionPixelSize(R.styleable.BubblePageIndicator_bpi_marginBetweenCircles, 0);
+        onSurfaceCount = a.getInteger(R.styleable.BubblePageIndicator_bpi_onSurfaceCount, 0);
+        risingCount = a.getInteger(R.styleable.BubblePageIndicator_bpi_risingCount, 0);
 
         a.recycle();
 
