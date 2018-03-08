@@ -50,10 +50,12 @@ indicator.setPageColor(ContextCompat.getColor(this, R.color.colorPrimary));
 // in px
 indicator.setRadius(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_radius));
 // in px
-indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_circles_margin));
+indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(
+            R.dimen.default_bubble_indicator_circles_margin));
 ```
 
 **onSurfaceCount** - number of circles with full radius
+
 **risingCount** - number of circles with scaled radius
 
 License
