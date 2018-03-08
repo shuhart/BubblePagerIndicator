@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="BubblePagerIndicator">
-        <attr name="BubblePageIndicatorDefaultStyle" format="reference" />
-    </declare-styleable>
 
     <declare-styleable name="BubblePageIndicator">
         <!-- Color of the filled circle that represents the current page. -->
@@ -13,5 +10,11 @@
         <attr name="radius" format="dimension" />
         <!-- Margin between the circles. -->
         <attr name="marginBetweenCircles" format="dimension" />
+        <!-- On surface circles count -->
+        <attr name="onSurfaceCount" format="integer" />
+        <!-- Rising circles count -->
+        <attr name="risingCount" format="integer" />
+        <!-- Default style -->
+        <attr name="indicatorStyle" format="reference" />
     </declare-styleable>
 </resources>

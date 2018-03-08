@@ -7,25 +7,55 @@ Usage
 -----
 
 1. Add jcenter() to repositories block in your gradle file.
-2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0.11'` to your dependencies.
-2. Add `BubblePageIndicator` into your layouts or view hierarchy.
-3. Look into the sample for additional details on how to use and configure the library.
-
-Example:
+2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0.12'` to your dependencies.
+3. Add `BubblePageIndicator` into your layouts or view hierarchy:
 
 ```xml
 <com.shuhart.bubblepagerindicator.BubblePageIndicator
-	android:id="@+id/indicator"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:layout_alignParentBottom="true"
-	android:layout_centerInParent="true"
-	android:layout_marginBottom="64dp"
-	app:fillColor="@color/colorAccent"
-	app:pageColor="@color/colorPrimary"
-	app:radius="3dp" />
+    android:id="@+id/indicator"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/pager"
+    android:layout_centerHorizontal="true"
+    android:layout_marginBottom="32dp"
+    android:layout_marginTop="32dp"
+    app:fillColor="@color/colorAccent"
+    app:pageColor="@color/colorPrimary"
+    app:radius="8dp"
+    app:marginBetweenCircles="6dp"
+    app:onSurfaceCount="@integer/default_bubble_indicator_on_surface_count"
+    app:risingCount="@integer/default_bubble_indicator_rising_count"/>
 
 ```
+
+4. Attach indicator to the ViewPager instance:
+
+```java
+pager = findViewById(R.id.pager);
+indicator = findViewById(R.id.indicator);
+adapter = new ViewPagerAdapter();
+pager.setAdapter(adapter);
+indicator.setViewPager(pager);
+```
+An adapter should be attached to the ViewPager before calling indicator.setViewPager(pager).
+
+5. You can customize the behavior in runtime:
+```java
+indicator.setOnSurfaceCount(3);
+indicator.setRisingCount(2);
+// resolved color
+indicator.setFillColor(ContextCompat.getColor(this, R.color.colorAccent));
+// resolved color
+indicator.setPageColor(ContextCompat.getColor(this, R.color.colorPrimary));
+// in px
+indicator.setRadius(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_radius));
+// in px
+indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_circles_margin));
+```
+
+**onSurfaceCount** - number of circles with full radius
+**risingCount** - number of circles with scaled radius
+
 License
 =======
 

@@ -3,15 +3,15 @@ package com.shuhart.bubblepagerindicator;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.support.annotation.ColorInt;
+import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -29,21 +29,18 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     private static final int ANIMATE_SHIFT_RIGHT = 2001;
     private static final int ANIMATE_IDLE = 2002;
 
-    private static final int DEFAULT_ON_SURFACE_COUNT = 5;
-    private static final int DEFAULT_RISING_COUNT = 2;
-
     private static final float ADD_RADIUS_DEFAULT = 1;
 
-    private int onSurfaceCount = DEFAULT_ON_SURFACE_COUNT;
-    private int risingCount = DEFAULT_RISING_COUNT;
+    private int onSurfaceCount;
+    private int risingCount;
     private int surfaceStart;
-    private int surfaceEnd = onSurfaceCount - 1;
+    private int surfaceEnd;
     private float radius;
     private float marginBetweenCircles;
     private final Paint paintPageFill = new Paint(ANTI_ALIAS_FLAG);
     private final Paint paintFill = new Paint(ANTI_ALIAS_FLAG);
     private int scrollState;
-    private float addRadius = ADD_RADIUS_DEFAULT;
+    private float scaleRadiusCorrection = ADD_RADIUS_DEFAULT;
 
     private ValueAnimator translationAnim;
 
@@ -108,34 +105,33 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     public BubblePageIndicator(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.BubblePageIndicatorDefaultStyle);
+        this(context, attrs, R.attr.indicatorStyle);
     }
 
     public BubblePageIndicator(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         if (isInEditMode()) return;
 
-        //Load defaults from resources
-        final Resources res = getResources();
-        final int defaultPageColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_page_color);
-        final int defaultFillColor = ContextCompat.getColor(context, R.color.default_bubble_indicator_fill_color);
-        final float defaultRadius = res.getDimension(R.dimen.default_bubble_indicator_radius);
-
         //Retrieve styles attributes
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubblePageIndicator, defStyle, 0);
 
         paintPageFill.setStyle(Style.FILL);
-        paintPageFill.setColor(a.getColor(R.styleable.BubblePageIndicator_pageColor, defaultPageColor));
+        paintPageFill.setColor(a.getColor(R.styleable.BubblePageIndicator_pageColor, 0));
         paintFill.setStyle(Style.FILL);
-        paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, defaultFillColor));
-        radius = a.getDimension(R.styleable.BubblePageIndicator_radius, defaultRadius);
-        marginBetweenCircles = a.getDimension(R.styleable.BubblePageIndicator_marginBetweenCircles, radius);
+        paintFill.setColor(a.getColor(R.styleable.BubblePageIndicator_fillColor, 0));
+        radius = a.getDimensionPixelSize(R.styleable.BubblePageIndicator_radius, 0);
+        marginBetweenCircles = a.getDimensionPixelSize(R.styleable.BubblePageIndicator_marginBetweenCircles, 0);
+        onSurfaceCount = a.getInteger(R.styleable.BubblePageIndicator_onSurfaceCount, 0);
+        risingCount = a.getInteger(R.styleable.BubblePageIndicator_risingCount, 0);
 
         a.recycle();
+
+        surfaceStart = 0;
+        surfaceEnd = onSurfaceCount - 1;
     }
 
-    public void setAddRadius(float value) {
-        addRadius = value;
+    public void setScaleRadiusCorrection(float value) {
+        scaleRadiusCorrection = value;
         forceLayoutChanges();
     }
 
@@ -150,30 +146,32 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         forceLayoutChanges();
     }
 
-    public void setPageColor(int pageColor) {
+    public void setPageColor(@ColorInt int pageColor) {
         paintPageFill.setColor(pageColor);
         invalidate();
     }
 
+    @ColorInt
     public int getPageColor() {
         return paintPageFill.getColor();
     }
 
-    public void setFillColor(int fillColor) {
+    public void setFillColor(@ColorInt int fillColor) {
         paintFill.setColor(fillColor);
         invalidate();
     }
 
+    @ColorInt
     public int getFillColor() {
         return paintFill.getColor();
     }
 
-    public void setRadius(float radius) {
+    public void setRadius(@Dimension float radius) {
         this.radius = radius;
         forceLayoutChanges();
     }
 
-    public void setMarginBetweenCircles(float margin) {
+    public void setMarginBetweenCircles(@Dimension float margin) {
         this.marginBetweenCircles = margin;
         forceLayoutChanges();
     }
@@ -242,7 +240,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     private float getScaledRadius(float radius, int position) {
         // circles to the left of the surface
         if (position < surfaceStart) {
-            float add = ((surfaceStart - position == 1) ? addRadius : 0);
+            float add = ((surfaceStart - position == 1) ? scaleRadiusCorrection : 0);
             // swipe left
             if (swipeDirection == SWIPE_LEFT && animationState == ANIMATE_SHIFT_LEFT) {
                 float finalRadius = radius / (2 << (surfaceStart - position - 1)) + add;
@@ -256,7 +254,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
                 return radius / (2 << (surfaceStart - position - 1)) + add;
             }
         } else if (position > surfaceEnd) { // circles to the right of the surface
-            float add = ((position - surfaceEnd == 1) ? addRadius : 0);
+            float add = ((position - surfaceEnd == 1) ? scaleRadiusCorrection : 0);
             // swipe left
             if (swipeDirection == SWIPE_LEFT && animationState == ANIMATE_SHIFT_LEFT) {
                 float finalRadius = radius / (2 << (position - surfaceEnd)) * 2 + add;
@@ -271,15 +269,15 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         } else if (position == currentPage) {
             // swipe left
             if (swipeDirection == SWIPE_LEFT && animationState == ANIMATE_SHIFT_LEFT) {
-                float finalRadius = radius + addRadius;
-                float currentRadius = radius / 2 + addRadius;
+                float finalRadius = radius + scaleRadiusCorrection;
+                float currentRadius = radius / 2 + scaleRadiusCorrection;
                 return currentRadius + (1 - offset) * (finalRadius - currentRadius);
             } else if (swipeDirection == SWIPE_RIGHT && animationState == ANIMATE_SHIFT_RIGHT) { // swipe right
-                float finalRadius = radius + addRadius;
-                float currentRadius = radius / 2 + addRadius;
+                float finalRadius = radius + scaleRadiusCorrection;
+                float currentRadius = radius / 2 + scaleRadiusCorrection;
                 return currentRadius + (1 - offset) * (finalRadius - currentRadius);
             } else {
-                return radius + addRadius;
+                return radius + scaleRadiusCorrection;
             }
         }
         return radius;
@@ -294,6 +292,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         canvas.drawCircle(dX, dY, getScaledRadius(radius, currentPage), paintFill);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void setViewPager(@NonNull ViewPager view) {
         if (viewPager != null) {
             viewPager.removeOnPageChangeListener(this);
@@ -540,7 +539,7 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
             result = specSize;
         } else {
             //Measure the height
-            result = (int) (2 * (radius + addRadius) + getPaddingTop() + getPaddingBottom());
+            result = (int) (2 * (radius + scaleRadiusCorrection) + getPaddingTop() + getPaddingBottom());
             //Respect AT_MOST value if that was what is called for by measureSpec
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BubblePagerIndicator">
+        <item name="fillColor">@color/default_bubble_indicator_fill_color</item>
+        <item name="pageColor">@color/default_bubble_indicator_page_color</item>
+        <item name="radius">@dimen/default_bubble_indicator_radius</item>
+        <item name="marginBetweenCircles">@dimen/default_bubble_indicator_circles_margin</item>
+        <item name="onSurfaceCount">@integer/default_bubble_indicator_on_surface_count</item>
+        <item name="risingCount">@integer/default_bubble_indicator_rising_count</item>
+    </style>
+</resources>
