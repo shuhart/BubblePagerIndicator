@@ -7,7 +7,7 @@ Usage
 -----
 
 1. Add jcenter() to repositories block in your gradle file.
-2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0.12'` to your dependencies.
+2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.0.13'` to your dependencies.
 3. Add `BubblePageIndicator` into your layouts or view hierarchy:
 
 ```xml
@@ -19,12 +19,12 @@ Usage
     android:layout_centerHorizontal="true"
     android:layout_marginBottom="32dp"
     android:layout_marginTop="32dp"
-    app:fillColor="@color/colorAccent"
-    app:pageColor="@color/colorPrimary"
-    app:radius="8dp"
-    app:marginBetweenCircles="6dp"
-    app:onSurfaceCount="@integer/default_bubble_indicator_on_surface_count"
-    app:risingCount="@integer/default_bubble_indicator_rising_count"/>
+    app:bpi_fillColor="@color/colorAccent"
+    app:bpi_pageColor="@color/colorPrimary"
+    app:bpi_radius="8dp"
+    app:bpi_marginBetweenCircles="6dp"
+    app:bpi_onSurfaceCount="@integer/default_bubble_indicator_on_surface_count"
+    app:bpi_risingCount="@integer/default_bubble_indicator_rising_count"/>
 
 ```
 
@@ -50,11 +50,27 @@ indicator.setPageColor(ContextCompat.getColor(this, R.color.colorPrimary));
 // in px
 indicator.setRadius(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_radius));
 // in px
-indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(R.dimen.default_bubble_indicator_circles_margin));
+indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(
+            R.dimen.default_bubble_indicator_circles_margin));
 ```
 
-**onSurfaceCount** - number of circles with full radius
-**risingCount** - number of circles with scaled radius
+## Customization
+| Attribute| Description | Default Value |
+|-----------------------|-----------------------|--------|
+| bpi_pageColor | Current page circle color. | #FFFFFF |
+| bpi_fillColor | Circles color | #000000 |
+| bpi_radius | Normal circle radius. | 3dp |
+| bpi_marginBetweenCircles | Margin between centers of circles. | 3dp |
+| bpi_onSurfaceCount | A number of circles with full radius (bpi_radius) | 5 |
+| bpi_risingCount | A number of scaled circles. | 2 |
+
+Maximum number of circles visible to the user is *bpi_onSurfaceCount* + *bpi_risingCount* * 2 (Default is 9).
+At the beginning only *bpi_onSurfaceCount* + *bpi_risingCount* (Default is 7) circles are visible.
+Radius for a rising circle is scaled by power of 2 with some correction applied.
+In every aspect the library is mimicking the Instagram indicator behavior.
+
+## Special thanks
+@tree1891 for his help in fixing many annoying issues.
 
 License
 =======
