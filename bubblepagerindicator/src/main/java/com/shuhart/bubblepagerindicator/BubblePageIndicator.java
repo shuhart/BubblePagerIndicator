@@ -473,13 +473,30 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private int getInitialStartX() {
-        int result;
+        int result = getInternalPaddingLeft();
+
         if (getCount() <= onSurfaceCount) {
-            result = (int) (getPaddingLeft() + radius);
-        } else {
-            result = (int) (getPaddingLeft() + radius * 4 + marginBetweenCircles * 2 + radius);
+            return result;
         }
-        return result;
+        int risingCount = getInternalRisingCount();
+        if (risingCount == 0) {
+            return result;
+        }
+        return (int) (result + risingCount * radius * 2 + (risingCount - 1) * marginBetweenCircles);
+    }
+
+    private int getInternalRisingCount() {
+        int risingCount;
+        if (getCount() < onSurfaceCount + this.risingCount) {
+            risingCount = getCount() - onSurfaceCount;
+        } else {
+            risingCount = this.risingCount;
+        }
+        return risingCount;
+    }
+
+    private int getInternalPaddingLeft() {
+        return (int) (getPaddingLeft() + radius);
     }
 
     private int measureWidth(int measureSpec) {
@@ -502,21 +519,15 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
     }
 
     private int calculateExactWidth() {
-        int count = getCount();
-        int maxCount = onSurfaceCount + risingCount * 2;
-        int diff = maxCount - count;
-        float width;
-        if (diff <= 1) {
-            width = getPaddingLeft() + getPaddingRight()
-                    + (maxCount * 2 * radius) + (maxCount - 1) * marginBetweenCircles;
-        } else {
-            width = getPaddingLeft() + getPaddingRight()
-                    + (count * 2 * radius) + (count - 1) * marginBetweenCircles;
-            if (count > onSurfaceCount) {
-                width += radius * 2 + marginBetweenCircles * 2;
-            }
+        int maxSurfaceCount = Math.min(getCount(), onSurfaceCount);
+        int risingCount = getInternalRisingCount();
+        int result = (int) (getPaddingLeft() + getPaddingRight()
+                + maxSurfaceCount * 2 * radius + (maxSurfaceCount - 1) * marginBetweenCircles);
+        if (risingCount > 0) {
+            result += risingCount * radius * 2 + (risingCount - 1) * marginBetweenCircles
+                    + getInitialStartX() - getInternalPaddingLeft();
         }
-        return (int) width;
+        return result;
     }
 
     private int measureHeight(int measureSpec) {

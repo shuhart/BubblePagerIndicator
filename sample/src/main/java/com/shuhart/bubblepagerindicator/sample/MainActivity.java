@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ViewPagerAdapter();
         pager.setAdapter(adapter);
         indicator.setViewPager(pager);
-        indicator.setOnSurfaceCount(3);
+        indicator.setEnabled(false);
         final SwipeRefreshLayout refreshLayout = findViewById(R.id.swipe_refresh_layout);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 refreshLayout.setRefreshing(false);
             }
         });
+        pager.setCurrentItem(5);
         findViewById(R.id.btn_page_number).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         adapter.setPages(new ArrayList<String>() {{
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 7; i++) {
                 add("Item " + i);
             }
         }});
