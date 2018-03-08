@@ -64,9 +64,9 @@ indicator.setMarginBetweenCircles(getResources().getDimensionPixelSize(
 | bpi_onSurfaceCount | A number of circles with full radius (bpi_radius) | 5 |
 | bpi_risingCount | A number of scaled circles. | 2 |
 
-Maximum number of circles visible to the user is *bpi_onSurfaceCount* + *bpi_risingCount* * 2 (Default is 9).
-At the beginning only *bpi_onSurfaceCount* + *bpi_risingCount* (Default is 7) circles are visible.
-Radius for a rising circle is scaled by power of 2 with some correction applied.
+Maximum number of circles visible to the user is *bpi_onSurfaceCount* + *bpi_risingCount* * 2 (Default is 9).  
+At the beginning only *bpi_onSurfaceCount* + *bpi_risingCount* (Default is 7) circles are visible.  
+Radius for a rising circle is scaled by power of 2 with some correction applied.  
 In every aspect the library is mimicking the Instagram indicator behavior.
 
 ## Special thanks
