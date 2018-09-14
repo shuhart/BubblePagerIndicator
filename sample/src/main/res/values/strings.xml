@@ -7,4 +7,9 @@
     <string name="next_screen">Blank screen</string>
     <string name="on_surface_count">On surface count</string>
     <string name="default_on_surface_count">5</string>
+    <string name="sample">Sample</string>
+    <string name="sample_simple_title">Simple</string>
+    <string name="sample_simple_subtitle">Simple example of Indicator with ViewPager in RelativeLayout</string>
+    <string name="sample_recyclerview_title">RecyclerView</string>
+    <string name="sample_recyclerview_subtitle">Indicator with ViewPager as an item in RecyclerView</string>
 </resources>

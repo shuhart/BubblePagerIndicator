@@ -297,7 +297,10 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
         if (viewPager != null) {
             viewPager.removeOnPageChangeListener(this);
             viewPager.removeOnAdapterChangeListener(this);
-            viewPager.getAdapter().unregisterDataSetObserver(dataSetObserver);
+            try {
+                viewPager.getAdapter().unregisterDataSetObserver(dataSetObserver);
+            } catch (Exception ignore) {
+            }
         }
         if (view.getAdapter() == null) {
             throw new IllegalStateException("ViewPager does not have adapter instance.");

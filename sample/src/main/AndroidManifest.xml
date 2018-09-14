@@ -18,8 +18,9 @@
         </activity>
         <activity
             android:name=".BlankActivity"
-            android:label="@string/title_activity_blank"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_blank" />
+        <activity android:name=".RecyclerViewSampleActivity" />
+        <activity android:name=".SimpleActivity" />
     </application>
 
 </manifest>

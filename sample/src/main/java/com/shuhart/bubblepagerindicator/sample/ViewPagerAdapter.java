@@ -21,7 +21,6 @@ public class ViewPagerAdapter extends PagerAdapter {
         this.pages = pages;
     }
 
-
     @Override
     public int getCount() {
         return pages.size();
