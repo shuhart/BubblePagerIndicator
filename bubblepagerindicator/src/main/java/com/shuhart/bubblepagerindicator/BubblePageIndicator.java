@@ -182,7 +182,10 @@ public class BubblePageIndicator extends MotionIndicator implements ViewPager.On
 
     @Override
     protected int getCount() {
-        return viewPager.getAdapter() == null ? 0 : viewPager.getAdapter().getCount();
+        if (viewPager == null || viewPager.getAdapter() == null) {
+            return 0;
+        }
+        return viewPager.getAdapter().getCount();
     }
 
     @Override
