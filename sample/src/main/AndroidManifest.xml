@@ -21,6 +21,7 @@
             android:label="@string/title_activity_blank" />
         <activity android:name=".RecyclerViewSampleActivity" />
         <activity android:name=".SimpleActivity" />
+        <activity android:name=".DelayedActivity" />
     </application>
 
 </manifest>

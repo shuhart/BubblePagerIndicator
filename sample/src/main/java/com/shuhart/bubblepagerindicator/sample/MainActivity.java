@@ -26,12 +26,16 @@ public class MainActivity extends AppCompatActivity {
                     case RECYCLER_VIEW:
                         startActivity(new Intent(MainActivity.this, RecyclerViewSampleActivity.class));
                         break;
+                    case DELAYED:
+                        startActivity(new Intent(MainActivity.this, DelayedActivity.class));
+                        break;
                 }
             }
         };
         adapter.items = new ArrayList<SampleItem>(){{
             add(SampleItem.SIMPLE);
             add(SampleItem.RECYCLER_VIEW);
+            add(SampleItem.DELAYED);
         }};
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);

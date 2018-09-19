@@ -65,6 +65,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.SampleViewHold
                     title = context.getString(R.string.sample_simple_title);
                     subtitle = context.getString(R.string.sample_simple_subtitle);
                     break;
+                case DELAYED:
+                    title = context.getString(R.string.sample_delayed_title);
+                    subtitle = context.getString(R.string.sample_delayed_subtitle);
+                    break;
                 default:
                     throw new RuntimeException("Unknown item type");
             }

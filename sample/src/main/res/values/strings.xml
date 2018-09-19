@@ -12,4 +12,6 @@
     <string name="sample_simple_subtitle">Simple example of Indicator with ViewPager in RelativeLayout</string>
     <string name="sample_recyclerview_title">RecyclerView</string>
     <string name="sample_recyclerview_subtitle">Indicator with ViewPager as an item in RecyclerView</string>
+    <string name="sample_delayed_title">Delayed</string>
+    <string name="sample_delayed_subtitle">A simple example with delayed initialization</string>
 </resources>
