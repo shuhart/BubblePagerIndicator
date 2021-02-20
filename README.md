@@ -6,8 +6,8 @@ A view pager indicator view to deal with a large amount of pages. Nice scale and
 Usage
 -----
 
-1. Add jcenter() to repositories block in your gradle file.
-2. Add `implementation 'com.shuhart.bubblepagerindicator:bubblepagerindicator:1.1.2'` to your dependencies.
+1. Add mavenCentral() to repositories block in your gradle file.
+2. Add `implementation 'com.github.shuhart:bubblepagerindicator:1.2.0'` to your dependencies.
 3. Add `BubblePageIndicator` into your layouts or view hierarchy:
 
 ```xml
