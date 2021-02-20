@@ -1,3 +1,6 @@
+# Attention
+I'm not going to support this anymore. Just use a better solution, e.g. this one [Indefinite-Pager-Indicator](https://github.com/rbro112/Android-Indefinite-Pager-Indicator)
+
 # BubblePagerIndicator
 A view pager indicator view to deal with a large amount of pages. Nice scale and transition animations are supported.
 
